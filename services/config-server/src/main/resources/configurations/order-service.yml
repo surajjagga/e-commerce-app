@@ -1,0 +1,50 @@
+server:
+  port: 8870
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/order
+    username: guest
+    password: guest
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serialization.JsonSerializer
+      properties:
+        spring.json.type.mapping: orderConfirmation:com.example.orderservice.kafka.OrderConfirmation
+
+  application:
+    config:
+      customer-url: http://localhost:8222/api/v1/customers
+      product-url:  http://localhost:8222/api/v1/products
+      payment-url:  http://localhost:8222/api/v1/payments
+
+
+  cloud:
+    openfeign:
+      lazy-attributes-resolution: true
+      client:
+        config:
+          # Configuration for a specific Feign client named 'myServiceClient'
+          customer-service:
+            url: http://localhost:8222/api/v1/customers
+            connectTimeout: 5000
+            readTimeout: 5000
+            loggerLevel: basic
+          payment-service:
+            url: http://localhost:8222/api/v1/payments
+            connectTimeout: 5000
+            readTimeout: 5000
+            loggerLevel: basic
+          # Default configuration for all Feign clients
+          default:
+            connectTimeout: 3000
+            readTimeout: 3000
+            loggerLevel: full
